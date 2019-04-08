@@ -4,22 +4,21 @@ package marketplace
 type RuleType int
 
 const (
-	// ApplyAll to total price in checkout
-	ApplyAll RuleType = iota
-	// ApplyToProduct to a product
-	ApplyToProduct
+	// RuleTypeApplyAll to total price in checkout
+	RuleTypeApplyAll RuleType = iota
+	// RuleTypeApplyToProduct to a product
+	RuleTypeApplyToProduct
 )
 
 // RuleParam define rule param names
 type RuleParam string
 
 const (
-	ProductCode     RuleParam = "product_code"
-	PromotionPrice  RuleParam = "promotion_price"
-	CountCondition  RuleParam = "count_condition"
-	PriceCondition  RuleParam = "price_condition"
-	PriceValue      RuleParam = "price_value"
-	DiscountPercent RuleParam = "discount_percent"
+	ProductCode       RuleParam = "product_code"
+	PromotionPrice    RuleParam = "promotion_price"
+	MinCountCondition RuleParam = "min_count_condition"
+	MinPriceCondition RuleParam = "min_price_condition"
+	DiscountPercent   RuleParam = "discount_percent"
 )
 
 // Product product info
@@ -36,6 +35,19 @@ type Rule struct {
 	Settings map[RuleParam]string
 }
 
+// ProductRule product rule
+type ProductRule struct {
+	ProductCode    string
+	PromotionPrice float64
+	CountCondition int
+}
+
+// CheckoutRule rule
+type CheckoutRule struct {
+	PriceCondition  float64
+	DiscountPercent float64
+}
+
 // IProductRepository product repo
 type IProductRepository interface {
 	GetAllProducts() []Product
@@ -50,4 +62,5 @@ type IRuleRepository interface {
 // ICheckout checkout
 type ICheckout interface {
 	Scan(Product)
+	GetTotal()
 }

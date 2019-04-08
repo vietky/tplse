@@ -5,7 +5,7 @@ type ProductRepository struct {
 }
 
 // GetAllProducts get promotional rules
-func (*RuleRepository) GetAllProducts() []Product {
+func (*ProductRepository) GetAllProducts() []Product {
 	rules := []Product{}
 	rules = append(rules, Product{
 		Code:  "001",
@@ -26,7 +26,7 @@ func (*RuleRepository) GetAllProducts() []Product {
 }
 
 // GetProducts get products by id
-func (repo *RuleRepository) GetProducts(ids []string) []Product {
+func (repo *ProductRepository) GetProducts(ids []string) []Product {
 	products := repo.GetAllProducts()
 	result := []Product{}
 	for _, code := range ids {

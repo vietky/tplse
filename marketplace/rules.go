@@ -8,18 +8,18 @@ type RuleRepository struct {
 func (*RuleRepository) GetPromotionalRules() []Rule {
 	rules := []Rule{}
 	rules = append(rules, Rule{
-		Type: ApplyAll,
+		Type: RuleTypeApplyAll,
 		Settings: map[RuleParam]string{
-			PriceCondition:  "60.0",
-			DiscountPercent: "10",
+			MinPriceCondition: "60.0",
+			DiscountPercent:   "10",
 		},
 	})
 	rules = append(rules, Rule{
-		Type: ApplyAll,
+		Type: RuleTypeApplyToProduct,
 		Settings: map[RuleParam]string{
-			ProductCode:    "001",
-			PromotionPrice: "8.5",
-			CountCondition: "2",
+			ProductCode:       "001",
+			MinCountCondition: "2",
+			PromotionPrice:    "8.5",
 		},
 	})
 	return rules

@@ -14,15 +14,26 @@ type ProductCount struct {
 
 // Checkout checkout
 type Checkout struct {
-	promotionalRules []Rule
-	products         map[string]*ProductCount // key: productId int: count
+	products     map[string]*ProductCount // key: productId int: count
+	productRules []Rule                   // key: productId int: count
+	globalRules  []Rule                   // key: productId int: count
 }
 
 // NewCheckout new checkout
 func NewCheckout(rules []Rule) *Checkout {
+	var productRules []Rule
+	var globalRules []Rule
+	for _, r := range rules {
+		if r.Type == RuleTypeApplyAll {
+			globalRules = append(globalRules, r)
+		} else if r.Type == RuleTypeApplyToProduct {
+			productRules = append(productRules, r)
+		}
+	}
 	return &Checkout{
-		promotionalRules: rules,
-		products:         make(map[string]*ProductCount),
+		productRules: productRules,
+		globalRules:  globalRules,
+		products:     make(map[string]*ProductCount),
 	}
 }
 
@@ -38,15 +49,12 @@ func (c *Checkout) Scan(p *Product) {
 	c.products[p.Code].Count++
 }
 
-// GetTotal calculate total price
-func (c *Checkout) GetTotal() (float64, error) {
-	for _, rule := range c.promotionalRules {
-		if rule.Type == RuleTypeApplyAll {
-			continue
-		}
+func (c *Checkout) getTotalPriceForProductRule() (float64, error) {
+	for _, rule := range c.productRules {
 		for _, product := range c.products {
 			// fmt.Printf("product %+v\n", product)
 			if product.ProductCode == rule.Settings[ProductCode] {
+				// try to parse all conditions
 				v, err := strconv.ParseFloat(rule.Settings[PromotionPrice], 64)
 				if err != nil {
 					return 0, err
@@ -55,6 +63,7 @@ func (c *Checkout) GetTotal() (float64, error) {
 				if err != nil {
 					return 0, err
 				}
+				// check condition
 				if product.Count >= minCountCondition {
 					product.Price = v
 				}
@@ -65,11 +74,18 @@ func (c *Checkout) GetTotal() (float64, error) {
 	for _, product := range c.products {
 		result += product.Price * float64(product.Count)
 	}
-	for _, rule := range c.promotionalRules {
+	return result, nil
+}
+
+// GetTotal calculate total price
+func (c *Checkout) GetTotal() (float64, error) {
+	result, err := c.getTotalPriceForProductRule()
+	if err != nil {
+		return result, err
+	}
+	for _, rule := range c.globalRules {
+		// try to parse all conditions
 		// fmt.Println("RuleTypeApplyAll", rule.Settings)
-		if rule.Type == RuleTypeApplyToProduct {
-			continue
-		}
 		discountPercent, err := strconv.Atoi(rule.Settings[DiscountPercent])
 		if err != nil {
 			return result, err
@@ -78,6 +94,7 @@ func (c *Checkout) GetTotal() (float64, error) {
 		if err != nil {
 			return 0, err
 		}
+		// check condition to get a discount
 		if result >= (minPriceCondition) {
 			result = result * float64(100-discountPercent) / 100
 		}

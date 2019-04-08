@@ -1,6 +1,7 @@
 package marketplace
 
 import (
+	"math"
 	"strconv"
 )
 
@@ -54,7 +55,7 @@ func (c *Checkout) GetTotal() (float64, error) {
 				if err != nil {
 					return 0, err
 				}
-				if product.Count > minCountCondition {
+				if product.Count >= minCountCondition {
 					product.Price = v
 				}
 			}
@@ -77,9 +78,9 @@ func (c *Checkout) GetTotal() (float64, error) {
 		if err != nil {
 			return 0, err
 		}
-		if result > (minPriceCondition) {
+		if result >= (minPriceCondition) {
 			result = result * float64(100-discountPercent) / 100
 		}
 	}
-	return result, nil
+	return math.Round(result*100) / 100, nil
 }

@@ -1,12 +1,21 @@
 package marketplace
 
 import (
-	"strings"
 	"testing"
 )
 
+func TestCheckout0(t *testing.T) {
+	actual, err := Run("")
+	if err != nil {
+		t.Error(err)
+	}
+	if actual != 0 {
+		t.Errorf("actual value %v is not equal to 0", actual)
+	}
+}
+
 func TestCheckout1(t *testing.T) {
-	actual, err := checkout("001,002,003")
+	actual, err := Run("001,002,003")
 	if err != nil {
 		t.Error(err)
 	}
@@ -16,7 +25,7 @@ func TestCheckout1(t *testing.T) {
 }
 
 func TestCheckout2(t *testing.T) {
-	actual, err := checkout("001,003,001")
+	actual, err := Run("001,003,001")
 	if err != nil {
 		t.Error(err)
 	}
@@ -25,26 +34,11 @@ func TestCheckout2(t *testing.T) {
 	}
 }
 func TestCheckout3(t *testing.T) {
-	actual, err := checkout("001,002,001,003")
+	actual, err := Run("001,002,001,003")
 	if err != nil {
 		t.Error(err)
 	}
 	if actual != 73.76 {
 		t.Errorf("actual value %v is not equal to 73.76", actual)
 	}
-}
-
-func checkout(input string) (float64, error) {
-	ruleRepo := RuleRepository{}
-	productRepo := ProductRepository{}
-
-	promotionRules := ruleRepo.GetPromotionalRules()
-	products := productRepo.GetProducts(strings.Split(input, ","))
-
-	checkout := NewCheckout(promotionRules)
-	for _, p := range products {
-		checkout.Scan(&p)
-	}
-
-	return checkout.GetTotal()
 }

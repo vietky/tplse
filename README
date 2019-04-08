@@ -1,0 +1,11 @@
+## PREREQUISITES
+- install golang
+
+## FOLDER STRUCTURE
+- all tests are put in `checkout_test`
+- function `checkout` should be used in main
+
+## HOW TO RUN [TEST]
+- from your root, naviagate to ./marketplace folder `cd ./marketplace`
+- run `go test`
+

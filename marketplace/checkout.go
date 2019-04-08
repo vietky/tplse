@@ -99,5 +99,6 @@ func (c *Checkout) GetTotal() (float64, error) {
 			result = result * float64(100-discountPercent) / 100
 		}
 	}
+	// round up to 2 decimals
 	return math.Round(result*100) / 100, nil
 }
